@@ -3,16 +3,15 @@
     using System.ComponentModel.DataAnnotations;
 
     using static DataConstants;
-
-    public class Ingredient
+    public class Tag
     {
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(IngredientNameMaxLenght)]
+        [MaxLength(TagNameMaxLenght)]
         public string Name { get; set; }
 
-        public virtual ICollection<RecipeIngredient> Recipes { get; set; } = new HashSet<RecipeIngredient>();
+        public virtual ICollection<RecipeTag> Recipes { get; set; } = new HashSet<RecipeTag>();
 
         public DateTime CreatedOn { get; set; }
 

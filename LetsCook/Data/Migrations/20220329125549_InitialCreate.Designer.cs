@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LetsCook.Data.Migrations
 {
     [DbContext(typeof(LetsCookDbContext))]
-    [Migration("20220326032848_CreateRecipeModelAndRelatedEntities")]
-    partial class CreateRecipeModelAndRelatedEntities
+    [Migration("20220329125549_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -46,8 +46,8 @@ namespace LetsCook.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
 
@@ -84,16 +84,13 @@ namespace LetsCook.Data.Migrations
                     b.ToTable("Cuisines");
                 });
 
-            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Ingredient", b =>
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Difficulty", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<byte?>("Amount")
-                        .HasColumnType("tinyint");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -112,20 +109,34 @@ namespace LetsCook.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Note")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                    b.HasKey("Id");
 
-                    b.Property<string>("Unit")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                    b.ToTable("Difficulties");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients");
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("Images");
                 });
 
-            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Instruction", b =>
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Ingredient", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,24 +150,68 @@ namespace LetsCook.Data.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.InstructionStep", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RecipePartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StepNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipePartId");
+
+                    b.ToTable("InstructionSteps");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Note", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
                     b.Property<int>("RecipeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("Instructions");
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Recipe", b =>
@@ -186,10 +241,7 @@ namespace LetsCook.Data.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<int>("DietTag")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Difficulty")
+                    b.Property<int>("DifficultyId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -203,9 +255,6 @@ namespace LetsCook.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeSpan>("PreparationTime")
                         .HasColumnType("time");
 
@@ -218,22 +267,123 @@ namespace LetsCook.Data.Migrations
 
                     b.HasIndex("CuisineId");
 
+                    b.HasIndex("DifficultyId");
+
                     b.ToTable("Recipes");
                 });
 
             modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipeIngredient", b =>
                 {
-                    b.Property<int>("RecipeId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(4,2)");
 
                     b.Property<int>("IngredientId")
                         .HasColumnType("int");
 
-                    b.HasKey("RecipeId", "IngredientId");
+                    b.Property<string>("Note")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecipePartId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("IngredientId");
 
+                    b.HasIndex("RecipeId");
+
+                    b.HasIndex("RecipePartId");
+
                     b.ToTable("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipePart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("RecipeParts");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipeTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("RecipeTags");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -438,12 +588,34 @@ namespace LetsCook.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Instruction", b =>
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Image", b =>
                 {
                     b.HasOne("LetsCook.Data.Models.RecipeModel.Recipe", "Recipe")
-                        .WithMany("Instructions")
+                        .WithMany("Images")
                         .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.InstructionStep", b =>
+                {
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.RecipePart", "RecipePart")
+                        .WithMany("Instructions")
+                        .HasForeignKey("RecipePartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RecipePart");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Note", b =>
+                {
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.Recipe", "Recipe")
+                        .WithMany("Notes")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Recipe");
@@ -454,17 +626,24 @@ namespace LetsCook.Data.Migrations
                     b.HasOne("LetsCook.Data.Models.RecipeModel.Category", "Category")
                         .WithMany("Recipes")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LetsCook.Data.Models.RecipeModel.Cuisine", "Cuisine")
                         .WithMany("Recipes")
-                        .HasForeignKey("CuisineId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CuisineId");
+
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.Difficulty", "Difficulty")
+                        .WithMany("Recipes")
+                        .HasForeignKey("DifficultyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
 
                     b.Navigation("Cuisine");
+
+                    b.Navigation("Difficulty");
                 });
 
             modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipeIngredient", b =>
@@ -476,14 +655,52 @@ namespace LetsCook.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("LetsCook.Data.Models.RecipeModel.Recipe", "Recipe")
-                        .WithMany("Ingredients")
+                        .WithMany()
                         .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.RecipePart", "RecipePart")
+                        .WithMany("RecipeIngredients")
+                        .HasForeignKey("RecipePartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Ingredient");
 
                     b.Navigation("Recipe");
+
+                    b.Navigation("RecipePart");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipePart", b =>
+                {
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.Recipe", "Recipe")
+                        .WithMany("RecipeParts")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipeTag", b =>
+                {
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.Recipe", "Recipe")
+                        .WithMany("Tags")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LetsCook.Data.Models.RecipeModel.Tag", "Tag")
+                        .WithMany("Recipes")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -547,6 +764,11 @@ namespace LetsCook.Data.Migrations
                     b.Navigation("Recipes");
                 });
 
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Difficulty", b =>
+                {
+                    b.Navigation("Recipes");
+                });
+
             modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Ingredient", b =>
                 {
                     b.Navigation("Recipes");
@@ -554,9 +776,25 @@ namespace LetsCook.Data.Migrations
 
             modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Recipe", b =>
                 {
-                    b.Navigation("Ingredients");
+                    b.Navigation("Images");
 
+                    b.Navigation("Notes");
+
+                    b.Navigation("RecipeParts");
+
+                    b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.RecipePart", b =>
+                {
                     b.Navigation("Instructions");
+
+                    b.Navigation("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("LetsCook.Data.Models.RecipeModel.Tag", b =>
+                {
+                    b.Navigation("Recipes");
                 });
 #pragma warning restore 612, 618
         }

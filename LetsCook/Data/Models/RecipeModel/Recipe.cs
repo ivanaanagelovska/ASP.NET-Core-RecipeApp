@@ -3,7 +3,6 @@
     using System.ComponentModel.DataAnnotations;
 
     using static DataConstants;
-    using Data.Models.Enums;
 
     public class Recipe
     {
@@ -16,33 +15,31 @@
         [MaxLength(RecipeDescriptionMaxLenght)]
         public string Description { get; set; }
 
-        // TODO: Check for max time
         public TimeSpan PreparationTime { get; set; }
 
         public TimeSpan? CookingTime { get; set; }
 
         public TimeSpan? RestTime { get; set; }
 
+        public virtual ICollection<Image> Images { get; set; } = new HashSet<Image>();
+
         public int CategoryId { get; set; }
 
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
         public int? CuisineId { get; set; }
 
-        public Cuisine Cuisine { get; set; }
+        public virtual Cuisine Cuisine { get; set; }
 
-        [Required]
-        public Difficulty Difficulty { get; set; }
+        public int DifficultyId { get; set; }
 
-        public DietTag DietTag { get; set; }
+        public virtual Difficulty Difficulty { get; set; }
 
-        public virtual ICollection<RecipeIngredient> Ingredients { get; set; } = new HashSet<RecipeIngredient>();
+        public ICollection<RecipeTag> Tags { get; set; }
 
-        // TODO: Add instructions group name
-        [Required]
-        public ICollection<Instruction> Instructions { get; set; } = new HashSet<Instruction>();
-
-        public string Notes { get; set; }
+        public virtual ICollection<RecipePart> RecipeParts { get; set; }
+        
+        public virtual ICollection<Note> Notes { get; set; }
 
         public DateTime CreatedOn { get; set; }
 

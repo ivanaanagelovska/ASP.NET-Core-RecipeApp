@@ -6,10 +6,10 @@
 
     public class Cuisine
     {
-        public int Id { get; init; }
+        public int Id { get; set; }
 
         [Required]
-        [MaxLength(RecipeCuisineNameMaxLenght)]
+        [MaxLength(CuisineNameMaxLenght)]
         public string Name { get; set; }
 
         public virtual ICollection<Recipe> Recipes { get; set; } = new HashSet<Recipe>();

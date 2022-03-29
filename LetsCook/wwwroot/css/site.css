@@ -16,3 +16,12 @@ html {
 body {
     margin-bottom: 60px;
 }
+
+.space-right {
+    margin: 5px 0;
+}
+
+.heading-margin {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
